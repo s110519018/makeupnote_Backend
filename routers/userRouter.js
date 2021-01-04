@@ -75,6 +75,42 @@ userRouter.put(
   expressAsyncHandler(async (req, res) => {
     const { name, email, password, year, month, day, sex } = req.body;
     // password = bcrypt.hashSync(req.body.password, 8);
+    const user2 = await User.findOne({ email });
+      User.findOneAndUpdate({ _id: req.params.id }, {
+        "name": name,
+        "email": email,
+        "password": user2.password,
+        "year": year,
+        "month": month,
+        "day": day,
+        "sex": sex,
+      }, { new: true }, (err, doc) => {
+        if (err) {
+          console.log("Something wrong when updating data!");
+        }
+        console.log(doc);
+      });
+      const user = await User.findById({ _id: req.params.id });
+      res.send({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        password: user.password,
+        year: user.year,
+        month: user.month,
+        day: user.day,
+        sex: user.sex,
+        token: getToken(user),
+    });
+  })
+);
+userRouter.put(
+  "/password/:id",
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const { name, email, password, year, month, day, sex } = req.body;
+    // password = bcrypt.hashSync(req.body.password, 8);
     const psw = bcrypt.hashSync(password, 8);
     User.findOneAndUpdate({ _id: req.params.id }, {
       "name": name,
